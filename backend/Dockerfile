@@ -1,19 +1,19 @@
-# uv-managed image, pinned to Python 3.12.
-FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
+# Application Collection registry base (when pulling from dp.apps.rancher.io):
+#   FROM dp.apps.rancher.io/library/python:3.12-slim
+# Local hackathon builds use the public image; the application-collection pull
+# secret still applies when deploying charts from the registry.
+FROM python:3.12-slim
 
 ENV PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1 \
-    UV_COMPILE_BYTECODE=1 \
-    UV_LINK_MODE=copy
+    PYTHONDONTWRITEBYTECODE=1
 
 WORKDIR /app
 
-# Install runtime dependencies first for better layer caching.
-COPY pyproject.toml ./
-RUN uv sync --no-dev --no-install-project
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-EXPOSE 8000
+EXPOSE 8080
 
-CMD ["uv", "run", "--no-dev", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]

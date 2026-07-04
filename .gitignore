@@ -20,6 +20,9 @@ venv/
 .env
 **/.env
 !**/.env.example
+backend/.env
+mcp.json
+.cursor/mcp.json
 
 # Runtime data / artifacts
 backend/var/
@@ -29,3 +32,6 @@ backend/var/
 # OS / editor
 .DS_Store
 Thumbs.db
+
+# Local planning notes (not for repo)
+docs/CONDITION_DRIFT_PIVOT.md

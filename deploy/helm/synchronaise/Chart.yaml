@@ -1,0 +1,6 @@
+apiVersion: v2
+name: synchronaise
+description: SynchronAIse audit backend for local k3s (Rancher Desktop hackathon)
+type: application
+version: 0.1.0
+appVersion: "0.1.0"

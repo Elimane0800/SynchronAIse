@@ -1,0 +1,11 @@
+{
+  "servers": {
+    "application-collection": {
+      "type": "http",
+      "url": "https://mcp.apps.rancher.io",
+      "headers": {
+        "Authorization": "Basic <your-base64-encoded-credentials>"
+      }
+    }
+  }
+}

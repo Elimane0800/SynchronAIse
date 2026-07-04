@@ -114,7 +114,7 @@ There are 5 people. Everyone should work against the same JSON contract so front
 
 | Person | Current Focus | Primary Deliverable | Backup Responsibility |
 | --- | --- | --- | --- |
-| Salam | Agent deployment research, then backend support | Deployment path for backend/classifier agents using the current `docs/DEPLOYMENT_PLAN.md` direction | Help Ken and Yassine wire backend routes, schemas, and mocked audit data |
+| Salam | Agent deployment, then backend support | k3s deploy path for backend/classifier agents (see [Agent deployment](#agent-deployment)) | Help Ken and Yassine wire backend routes, schemas, and mocked audit data |
 | Jarfino | Frontend design | Website/Studio visual design and user flow | Help produce demo screenshots/video assets |
 | Raja | Frontend implementation | Working test website and Graph Studio UI | Help format the PR/report view |
 | Ken | Backend | Audit API, graph payload handling, storage/mock results | Help define JSON schema and report endpoint |
@@ -230,13 +230,7 @@ Recommended frontend shape:
   - explanation panel,
   - patch prompt/diff.
 
-Recommended deployment shape from `docs/DEPLOYMENT_PLAN.md`:
-
-- Start with backend plus classifier as one deployable service.
-- Containerize the backend with a small Python image.
-- Deploy locally through Rancher Desktop/k3s in the `hackathon` namespace.
-- Use Helm chart under `deploy/helm/synchronaise`.
-- Keep `.cursor/mcp.json`, `.env`, and all live credentials out of git.
+Recommended deployment shape: see [Agent deployment](#agent-deployment) — backend plus classifier as one service on local k3s (Rancher Desktop), Helm chart at `deploy/helm/synchronaise`, credentials kept out of git via `.gitignore`.
 
 ## JSON Contract
 
@@ -304,37 +298,49 @@ Start with 3 strong cases. Add more only if the core loop is stable.
 | 5 | New secondary button not present in design | `intentional_evolution` | Shows nuance |
 | 6 | Mixed valid wrapper plus real color mismatch | Mixed | Shows separation of signal and noise |
 
-## Deployment Plan
+## Agent deployment
 
-The deployment work should stay practical. The goal is to deploy the audit agents/backend, not to overbuild infrastructure.
+> **Built during RAISE Hackathon 2026** — local k3s path for the audit backend and LLM classifier agents.
 
-Current direction:
+SynchronAIse deploys the FastAPI audit service and classifier as a **single container** onto local **k3s** via **Rancher Desktop**. The release runs in the **`hackathon`** namespace and uses the **`application-collection`** image-pull secret (for `dp.apps.rancher.io`) created by the workstation bootstrap.
 
-1. Reuse the Rancher Desktop/k3s bootstrap described in `docs/DEPLOYMENT_PLAN.md`.
-2. Scaffold the backend audit service first so there is something real to containerize.
-3. Build a local container image for the backend/classifier service.
-4. Deploy to the `hackathon` namespace with Helm.
-5. Port-forward the service for local GitHub Action/manual testing.
+### Bootstrap dependency
 
-Planned files:
+Deploying from this repo assumes **rancher-hackathon-paris** has already been run **once** on the machine:
 
-- `backend/app/main.py`
-- `backend/pyproject.toml`
-- `backend/.env.example`
-- `backend/Dockerfile`
-- `deploy/helm/synchronaise/Chart.yaml`
-- `deploy/helm/synchronaise/values.yaml`
-- `deploy/helm/synchronaise/templates/deployment.yaml`
-- `deploy/helm/synchronaise/templates/service.yaml`
-- `deploy/deploy.ps1`
-- `deploy/deploy.sh`
-- `deploy/README.md`
+```text
+init.bat   # from the rancher-hackathon-paris repo
+```
 
-Secret rules:
+That bootstrap leaves kubectl context `rancher-desktop`, namespace `hackathon`, registry login, and the `application-collection` pull secret. Without it, `deploy/deploy.ps1` and `deploy/deploy.sh` exit with a message pointing back to `init.bat`.
+
+### Quick deploy
+
+From the repo root:
+
+```powershell
+.\deploy\deploy.ps1
+```
+
+```bash
+./deploy/deploy.sh
+```
+
+The scripts verify context and pull secret, build `synchronaise-backend:dev` into the k3s image store, then run `helm upgrade --install` from **`deploy/helm/synchronaise`** into **`hackathon`** with `global.imagePullSecrets={application-collection}`.
+
+Forward the service locally:
+
+```bash
+kubectl port-forward -n hackathon svc/synchronaise 8080:8080
+```
+
+**Full steps** — prerequisites, LLM secret setup, script flags, Application Collection MCP, and troubleshooting — are in **[deploy/README.md](deploy/README.md)**.
+
+### Secret rules
 
 - Never commit API keys, MCP Basic auth tokens, GitHub tokens, or `.env`.
-- Commit only `.env.example` and `.cursor/mcp.example.json`.
-- Add `.cursor/mcp.json`, `mcp.json`, and `.env` to `.gitignore`.
+- Commit only `backend/.env.example` and `.cursor/mcp.example.json`.
+- Keep `.cursor/mcp.json`, `mcp.json`, and `.env` in `.gitignore`.
 
 ## Demo Script
 

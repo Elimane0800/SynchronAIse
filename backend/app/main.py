@@ -57,11 +57,21 @@ def _seed_mock() -> None:
         storage.save(payload)
 
 
-@app.get("/healthz")
-def healthz() -> dict[str, object]:
+def _health_payload() -> dict[str, object]:
     return {
         "status": "ok",
         "version": __version__,
         "mock_mode": settings.mock_mode,
         "stored_audits": storage.list_ids(),
     }
+
+
+@app.get("/health")
+def health() -> dict[str, object]:
+    """Liveness/readiness probe for deploy scripts and Kubernetes."""
+    return _health_payload()
+
+
+@app.get("/healthz")
+def healthz() -> dict[str, object]:
+    return _health_payload()

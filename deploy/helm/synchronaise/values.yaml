@@ -1,0 +1,39 @@
+global:
+  imagePullSecrets:
+    - application-collection
+
+replicaCount: 1
+
+image:
+  repository: synchronaise-backend
+  tag: dev
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 8080
+
+# LLM / VLM credentials. Set create=true and fill secret.data for chart-managed
+# secrets, or create manually:
+#   kubectl create secret generic synchronaise-llm -n hackathon \
+#     --from-literal=LLM_PROVIDER=gemini \
+#     --from-literal=GEMINI_API_KEY=... \
+#     --from-literal=OPENAI_API_KEY=...
+secret:
+  create: false
+  name: synchronaise-llm
+  data:
+    LLM_PROVIDER: gemini
+    GEMINI_API_KEY: ""
+    GEMINI_MODEL: gemini-2.0-flash
+    OPENAI_API_KEY: ""
+    OPENAI_MODEL: gpt-4o-mini
+
+# Non-sensitive runtime config (see backend/.env.example).
+env:
+  REQUEST_TIMEOUT_S: "45"
+  MAX_RETRIES: "2"
+  CORS_ORIGINS: "http://localhost:5173,http://127.0.0.1:5173"
+  STUDIO_BASE_URL: "http://localhost:5173"
+
+resources: {}
