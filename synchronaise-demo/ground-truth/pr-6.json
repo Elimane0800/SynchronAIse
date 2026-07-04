@@ -1,0 +1,24 @@
+{
+  "pr_number": 6,
+  "title": "Cases 1 + 3 combined in the same file",
+  "expected_class": "mixed",
+  "expected_findings": [
+    {
+      "expected_class": "design_violation",
+      "type": "token_violation",
+      "node_id": "btn-primary",
+      "location": "StatusCard.tsx:14",
+      "expected": "var(--color-danger)",
+      "actual": "#ef4444",
+      "bbox": [120, 48, 340, 92]
+    }
+  ],
+  "expected_noise": [
+    {
+      "expected_class": "technical_noise",
+      "element": "div.scroll-wrapper",
+      "location": "StatusCard.tsx:9"
+    }
+  ],
+  "why": "Proves the system separates signals: flags the hardcoded hex AND ignores the wrapper div in one pass."
+}

@@ -1,0 +1,12 @@
+# SynchronAIse audit service
+fastapi
+uvicorn[standard]
+pydantic>=2
+python-multipart
+httpx
+jsonschema
+# VLM providers (optional at runtime; MOCK_MODE works without them)
+google-generativeai
+openai
+# dev / test
+pytest

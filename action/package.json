@@ -1,0 +1,11 @@
+{
+  "name": "synchronaise-action",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Runtime dependencies for the SynchronAIse GitHub Action scripts.",
+  "dependencies": {
+    "playwright": "1.47.0",
+    "wait-on": "^8.0.1"
+  }
+}

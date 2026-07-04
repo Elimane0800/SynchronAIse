@@ -1,0 +1,12 @@
+{
+  "pr_number": 4,
+  "title": "Component rebuilt from scratch mimicking the StatusCard",
+  "expected_class": "design_violation",
+  "type": "structural_violation",
+  "node_id": "card",
+  "location": "StatusCard.tsx:1",
+  "expected": "shared StatusCard component",
+  "actual": "bespoke re-implementation",
+  "bbox": [0, 0, 420, 120],
+  "why": "Rogue re-implementation of an existing design-system component (subgraph matching)."
+}

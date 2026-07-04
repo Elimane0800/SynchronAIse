@@ -1,0 +1,12 @@
+{
+  "pr_number": 5,
+  "title": "New secondary button absent from Figma",
+  "expected_class": "intentional_evolution",
+  "type": "evolution",
+  "node_id": "btn-secondary",
+  "location": "StatusCard.tsx:20",
+  "expected": "not present in design intent",
+  "actual": "secondary action button",
+  "bbox": [220, 48, 400, 92],
+  "why": "Nuance: propose reconciliation (add to design system), don't roll back."
+}

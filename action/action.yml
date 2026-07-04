@@ -1,0 +1,93 @@
+name: "SynchronAIse Design Audit"
+description: "On PR, render changed components, run the AI design audit, and post/update a PR comment with a Cursor patch + Studio link."
+author: "SynchronAIse"
+branding:
+  icon: "eye"
+  color: "purple"
+
+inputs:
+  audit-api-url:
+    description: "Base URL of the SynchronAIse audit service (e.g. https://audit.example.dev)."
+    required: true
+  studio-base-url:
+    description: "Base URL of the Graph Reconciliation Studio, used to build report links."
+    required: false
+    default: ""
+  github-token:
+    description: "Token used to post the PR comment."
+    required: false
+    default: ${{ github.token }}
+  component-glob:
+    description: "Glob of component files to audit."
+    required: false
+    default: "src/components/**/*.tsx"
+  tokens-path:
+    description: "Path to the design tokens JSON in the demo repo."
+    required: false
+    default: "src/tokens.json"
+  render-url:
+    description: "URL of the preview server serving the render harness."
+    required: false
+    default: "http://localhost:4173"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: "20"
+
+    - name: Install demo dependencies
+      shell: bash
+      run: npm ci || npm install
+
+    - name: Build demo app
+      shell: bash
+      run: npm run build --if-present
+
+    - name: Install action dependencies
+      shell: bash
+      run: npm --prefix "${{ github.action_path }}" install --no-audit --no-fund
+
+    - name: Install Playwright (chromium, pinned)
+      shell: bash
+      run: npx --yes --prefix "${{ github.action_path }}" playwright install --with-deps chromium
+
+    - name: Start preview server
+      shell: bash
+      run: |
+        nohup npm run preview -- --port 4173 --host > .synchronaise-preview.log 2>&1 &
+        node "${{ github.action_path }}/node_modules/wait-on/bin/wait-on" "${{ inputs.render-url }}" --timeout 60000
+
+    - name: Detect changed components
+      shell: bash
+      run: node "${{ github.action_path }}/scripts/changed-files.mjs"
+      env:
+        COMPONENT_GLOB: ${{ inputs.component-glob }}
+        BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+
+    - name: Render + snapshot changed components
+      shell: bash
+      run: node "${{ github.action_path }}/scripts/render.mjs"
+      env:
+        RENDER_URL: ${{ inputs.render-url }}
+        TOKENS_PATH: ${{ inputs.tokens-path }}
+
+    - name: Run design audit
+      shell: bash
+      run: node "${{ github.action_path }}/scripts/audit.mjs"
+      env:
+        AUDIT_API_URL: ${{ inputs.audit-api-url }}
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+        RUN_NUMBER: ${{ github.run_number }}
+
+    - name: Post / update PR comment
+      shell: bash
+      run: node "${{ github.action_path }}/scripts/comment.mjs"
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+        GITHUB_REPOSITORY: ${{ github.repository }}
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+        STUDIO_BASE_URL: ${{ inputs.studio-base-url }}

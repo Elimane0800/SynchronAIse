@@ -1,0 +1,5 @@
+node_modules/
+dist/
+.synchronaise/
+*.log
+.DS_Store

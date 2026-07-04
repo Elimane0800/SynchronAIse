@@ -1,0 +1,11 @@
+{
+  "pr_number": 3,
+  "title": "Wrapper div added for scroll/flexbox handling",
+  "expected_class": "technical_noise",
+  "type": "structural_noise",
+  "node_id": null,
+  "element": "div.scroll-wrapper",
+  "location": "StatusCard.tsx:9",
+  "bbox": null,
+  "why": "THE taste moment - a naive linter would flag it. No visual or semantic impact; must be ignored with reasoning."
+}

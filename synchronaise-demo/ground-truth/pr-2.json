@@ -1,0 +1,12 @@
+{
+  "pr_number": 2,
+  "title": "15px padding instead of 16px (spacing-md)",
+  "expected_class": "design_violation",
+  "type": "spacing_violation",
+  "node_id": "card",
+  "location": "StatusCard.tsx:29",
+  "expected": "var(--spacing-md)",
+  "actual": "15px",
+  "bbox": [0, 0, 420, 120],
+  "why": "Pixel-level precision; 15px is off the 8px spacing scale."
+}

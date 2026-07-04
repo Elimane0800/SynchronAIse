@@ -1,0 +1,12 @@
+{
+  "pr_number": 1,
+  "title": "Hardcoded #ef4444 instead of var(--color-danger)",
+  "expected_class": "design_violation",
+  "type": "token_violation",
+  "node_id": "btn-primary",
+  "location": "StatusCard.tsx:14",
+  "expected": "var(--color-danger)",
+  "actual": "#ef4444",
+  "bbox": [120, 48, 340, 92],
+  "why": "Obvious case, opens the demo. Hex matches the color-danger token exactly."
+}
