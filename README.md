@@ -319,7 +319,7 @@ Current direction:
 Planned files:
 
 - `backend/app/main.py`
-- `backend/requirements.txt`
+- `backend/pyproject.toml`
 - `backend/.env.example`
 - `backend/Dockerfile`
 - `deploy/helm/synchronaise/Chart.yaml`

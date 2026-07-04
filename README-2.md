@@ -113,12 +113,16 @@ Five components, mapped to the five roles:
 
 ### Backend (audit service)
 
+Dependencies are managed with [uv](https://docs.astral.sh/uv/) and the backend is
+pinned to **Python 3.12** (see `backend/.python-version`). `uv sync` creates the
+virtual env and installs everything (uv will fetch Python 3.12 automatically if
+you don't have it).
+
 ```bash
 cd backend
-python -m venv .venv && . .venv/Scripts/activate   # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-cp .env.example .env            # add GEMINI_API_KEY / OPENAI_API_KEY, or leave blank for MOCK_MODE
-uvicorn app.main:app --reload   # http://localhost:8000  (/healthz, /docs)
+uv sync                            # create .venv + install deps (auto-fetches Python 3.12)
+cp .env.example .env               # add GEMINI_API_KEY / OPENAI_API_KEY, or leave blank for MOCK_MODE
+uv run uvicorn app.main:app --reload   # http://localhost:8000  (/healthz, /docs)
 ```
 
 Without API keys the service runs the deterministic heuristic Taste Engine - the
@@ -144,9 +148,9 @@ demo repo's workflow at this repo's `action/`, and set `AUDIT_API_URL` +
 
 ```bash
 cd backend
-pytest                      # contract + Taste Engine over the 6 golden cases
-python scripts/metrics.py   # the REAL numbers used in the pitch
-python scripts/validate_contract.py packages/contract/contract.example.json
+uv run pytest                      # contract + Taste Engine over the 6 golden cases
+uv run python scripts/metrics.py   # the REAL numbers used in the pitch
+uv run python scripts/validate_contract.py packages/contract/contract.example.json
 ```
 
 ## Built during the event
